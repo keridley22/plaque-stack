@@ -1,0 +1,5 @@
+Metric,Decision Tree OC,Decision Tree M04,Decision Tree Combined,Random Forest OC,Random Forest M04,Random Forest Combined
+Accuracy,82.61%,76.09%,88.04%,88.04%,90.22%,84.78%
+Specificity,88.64%,95.45%,86.36%,77.27%,88.64%,86.36%
+Sensitivity,77.08%,58.33%,89.58%,97.92%,91.67%,83.33%
+Primary Features,"Major axis length, solidity","Solidity, extent, surface area","Major axis length of OC, volume ratio, solidity of OC","Major axis length, solidity, area","Extent, solidity, minor axis length","Volume ratio, major axis length of OC, solidity of M04"
