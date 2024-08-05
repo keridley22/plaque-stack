@@ -87,15 +87,45 @@ def calculate_morphological_properties(labeled_img):
 
     return properties
 
+
+
 def update_and_save_summary(folder_path, properties, volume_ratio, genotype, image_name):
     summary = get_summary_statistics(properties, genotype, volume_ratio)
+    region = find_regions(image_name)
+    subregion = find_subregions(image_name)
     summary['volume_ratio'] = volume_ratio
     summary['image_name'] = image_name
+    summary['region'] = region
+    summary['subregion'] = subregion
     summary_df = pd.DataFrame([summary])
     output_csv = os.path.join(folder_path, f"{image_name}_summary.csv")
     summary_df.to_csv(output_csv, index=False)
 
     return summary
+
+def find_regions(filename):
+    HI = ['CA1', 'DGG', 'DGM']
+    SSCTX = ['L1', 'L23', 'L4']
+    #if filename contains item in HI list, return HI regions
+    if any(region in filename for region in HI):
+        return 'HIPPOCAMPUS'
+    #if filename contains SSCTX, return SSCTX regions
+    elif any(region in filename for region in SSCTX):
+        return 'SSCORTEX'
+    
+def find_subregions(filename):
+    HI = ['CA1', 'DGG', 'DGM']
+    SSCTX = ['L1', 'L23', 'L4']
+    #if item in HI list is in filename, return that item
+    for region in HI:
+        if region in filename:
+            return region
+    #if item in SSCTX list is in filename, return that item
+    for region in SSCTX:
+        if region in filename:
+            return region
+
+    
 
 def save_properties(properties, genotype, output_csv):
         df = pd.DataFrame(properties)
@@ -107,8 +137,8 @@ def save_properties(properties, genotype, output_csv):
 
 def mannwhitneyu_test(df, column, group_column):
     from scipy.stats import mannwhitneyu
-    group1 = df[df[group_column] == 'WT'][column]
-    group2 = df[df[group_column] == 'APP'][column]
+    group1 = df[df[group_column] == 'APPPS1'][column]
+    group2 = df[df[group_column] == 'APPPS1xFIRE'][column]
     return mannwhitneyu(group1, group2)
 
 def violinplots(df, column, group_column, title):
@@ -267,7 +297,7 @@ def process_image_pair(m04_file, oc_file, folder_path, metadata):
 
     oc_combined_properties = process_image_for_largest_cluster(oc_labeled, oc_file)
 
-    combined_csv_m04 = os.path.join(folder_path, f"{m04_file.replace('_M04.tiff', '')}_m04_combined_properties.csv")
+    combined_csv_m04 = os.path.join(folder_path, f"{m04_file.replace('_M04.tiff', '')}_m04_combined_properties.csv")                                                                                                                                             
     save_properties([m04_combined_properties], genotype, combined_csv_m04)
 
     combined_csv_oc = os.path.join(folder_path, f"{oc_file.replace('_OC.tiff', '')}_oc_combined_properties.csv")
@@ -334,7 +364,7 @@ def process_folder(folder_path, metadata):
     
 
 if __name__ == "__main__":
-    folder_path = "/Users/katherineridley/Dropbox (UK Dementia Research Institute)/KRidley/PlaqueStack/Masks"
+    folder_path = "/Users/katherineridley/Projects/PlaqueStack/Masks"
     metadata_file = os.path.join(folder_path, 'metadata.csv')
     metadata = load_metadata(metadata_file)
     process_folder(folder_path, metadata)
